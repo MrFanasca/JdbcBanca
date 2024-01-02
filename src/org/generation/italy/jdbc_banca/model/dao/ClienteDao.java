@@ -85,4 +85,25 @@ public class ClienteDao extends ADao{
 		
 		preparedStatementInsertCliente.executeQuery();
 	}
+	
+	// remove => DELETE FROM
+	/**
+		// DELETE FROM cliente
+		//		 WHERE codice_fiscale = ?
+	 * @param codFiscale codice identificativo del cliente da eliminare
+	 * @throws SQLException
+	 */
+	public void removeClienteByPrimaryKey (String codFiscale) throws SQLException {
+
+		String deleteCliente =
+				"DELETE FROM cliente           "
+			  + "      WHERE codice_fiscale = ?";
+
+		PreparedStatement preparedStatementDeleteCliente =
+				this.jdbcConnectionToDatabase.prepareStatement(deleteCliente);
+
+		preparedStatementDeleteCliente.setString(1, codFiscale);
+
+		preparedStatementDeleteCliente.executeQuery();
+	}	
 }

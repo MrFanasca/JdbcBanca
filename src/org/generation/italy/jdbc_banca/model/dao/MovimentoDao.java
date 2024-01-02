@@ -22,11 +22,11 @@ public class MovimentoDao extends ADao{
 	   // SELECT iban, codice_fiscale, importo, tipo_operazione
 	   //   FROM movimento
 	   //  WHERE id = ?
-	 * @param id numero identificatifo del movimento
+	 * @param idMovimento numero identificatifo del movimento
 	 * @return oggetto di tipo classe movimento
 	 * @throws SQLException
 	 */
-	public Movimento loadMovimentoByPrimaryKey (Integer id)	throws SQLException {
+	public Movimento loadMovimentoByPrimaryKey (Integer idMovimento)	throws SQLException {
 		
 		String selectFromMovimentoByPrimaryKey = 
 				"SELECT id, importo, tipo_operazione, iban, data_ora_operazione"
@@ -36,7 +36,7 @@ public class MovimentoDao extends ADao{
 		PreparedStatement preparedStatement = 
 				this.jdbcConnectionToDatabase.prepareStatement(selectFromMovimentoByPrimaryKey);
 		
-		preparedStatement.setInt(1, id);
+		preparedStatement.setInt(1, idMovimento);
 		
 		ResultSet rsSelect = 
 				preparedStatement.executeQuery();
@@ -45,9 +45,9 @@ public class MovimentoDao extends ADao{
 		
 		if (rsSelect.next())	{
 			
-			Integer id1 = rsSelect.getInt("id_movimento");
+			Integer id = rsSelect.getInt("id");
 			if (rsSelect.wasNull())	{
-				id1 = 0;
+				id = 0;
 			}
 			
 			Float importo = rsSelect.getFloat("importo");
@@ -70,7 +70,7 @@ public class MovimentoDao extends ADao{
 				dataOraOperazione = LocalDate.of(0, 0, 0); 
 			}
 			
-			movimentoTrovato = new Movimento (id1, importo, tipoOperazione, iban, dataOraOperazione);
+			movimentoTrovato = new Movimento (id, importo, tipoOperazione, iban, dataOraOperazione);
 		}
 				
 		return movimentoTrovato;
@@ -101,7 +101,7 @@ public class MovimentoDao extends ADao{
 		
 		while (rsSelect.next())	{
 			
-			Integer id = rsSelect.getInt("id_movimento");
+			Integer id = rsSelect.getInt("id");
 			if (rsSelect.wasNull())	{
 				id = 0;
 			}
@@ -157,5 +157,26 @@ public class MovimentoDao extends ADao{
 		//preparedStatementInsertMovimento.setDate(5, movimento.getDataOraOperazione().toDate);
 			
 		preparedStatementInsertMovimento.executeQuery();
-	}	
+	}
+	
+	// remove => DELETE FROM
+	/**
+	 // DELETE FROM movimento
+	 //		  WHERE id = ?
+	 * @param idMovimento numero identificativo del movimento da eliminare
+	 * @throws SQLException
+	 */
+	public void removeMovimentoByPrimaryKey (int idMovimento) throws SQLException {
+		
+		String deleteMovimento =
+				"DELETE FROM movimento"
+			  + "      WHERE id = ?   ";
+		
+		PreparedStatement preparedStatementDeleteMovimento =
+				this.jdbcConnectionToDatabase.prepareStatement(deleteMovimento);
+		
+		preparedStatementDeleteMovimento.setInt(1, idMovimento);
+		
+		preparedStatementDeleteMovimento.executeQuery();
+	}
 }

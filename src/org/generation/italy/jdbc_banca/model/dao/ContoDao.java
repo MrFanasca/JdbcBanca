@@ -99,4 +99,25 @@ public class ContoDao extends ADao{
 			
 		preparedStatementInsertConto.executeQuery();
 	}
+	
+	// remove => DELETE FROM
+	/**
+	// DELETE FROM conto
+	//		  WHERE iban = ?
+	* @param iban numero identificativo del conto da eliminare
+	* @throws SQLException
+	*/
+	public void removeContoByPrimaryKey (String iban) throws SQLException {
+			
+		String deleteConto =
+				"DELETE FROM conto   "
+			  + "      WHERE iban = ?";
+			
+		PreparedStatement preparedStatementDeleteConto =
+				this.jdbcConnectionToDatabase.prepareStatement(deleteConto);
+			
+		preparedStatementDeleteConto.setString(1, iban);
+			
+		preparedStatementDeleteConto.executeQuery();
+	}
 }
