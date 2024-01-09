@@ -2,6 +2,8 @@ package org.generation.italy.jdbc_banca.model.entity;
 
 import java.util.Objects;
 
+// Classe entity-bean Cliente che effettua il mapping del record della tabella Cliente
+
 public class Cliente {
 	
 	/***********************/

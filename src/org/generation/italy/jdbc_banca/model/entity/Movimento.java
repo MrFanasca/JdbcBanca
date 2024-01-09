@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+// Classe entity-bean Movimento che effettua il mapping del record della tabella Movimento
+
 public class Movimento {
 	
 	/***********************/

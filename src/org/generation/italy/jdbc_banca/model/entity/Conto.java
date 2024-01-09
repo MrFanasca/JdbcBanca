@@ -1,8 +1,9 @@
 package org.generation.italy.jdbc_banca.model.entity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+
+// Classe entity-bean Conto che effettua il mapping del record della tabella Conto
 
 public class Conto {
 	
