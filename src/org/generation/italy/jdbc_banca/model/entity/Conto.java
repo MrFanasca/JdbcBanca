@@ -1,10 +1,10 @@
 package org.generation.italy.jdbc_banca.model.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Conto {
-	
 	
 	/***********************/
     // DEFINIZIONE ATTRIBUTI
@@ -12,13 +12,24 @@ public class Conto {
 		private String iban;
 		private String valuta;
 		private String codiceFiscale;
-		private Integer scoperto;
-		private LocalDate dataOraIntestazione;
+		private Float scoperto;
+		private LocalDateTime dataOraIntestazione;
 
 	/***********************/
 	// COSTRUTTORE
 	/***********************/	
-		public Conto(String iban, String valuta, String codiceFiscale, Integer scoperto, LocalDate dataOraIntestazione) {
+	// costruttore usato per il metodo di INSERT
+		public Conto(String iban, String codiceFiscale, String valuta, Float scoperto) {
+			super();
+			this.iban = iban;
+			this.valuta = valuta;
+			this.scoperto = scoperto;
+			this.codiceFiscale = codiceFiscale;
+			this.dataOraIntestazione = null;
+		}
+		
+	// costruttore usato per i metodi di SELECT		
+		public Conto(String iban, String valuta, String codiceFiscale, Float scoperto, LocalDateTime dataOraIntestazione) {
 		
 			this.iban = iban;
 			this.valuta = valuta;
@@ -37,16 +48,22 @@ public class Conto {
 		public String getValuta() {
 			return valuta;
 		}
+		public void setValuta(String valuta) {
+			this.valuta = valuta;
+		}
 
 		public String getCodiceFiscale() {
 			return codiceFiscale;
 		}
 
-		public Integer getScoperto() {
+		public Float getScoperto() {
 			return scoperto;
 		}
+		public void setScoperto(Float scoperto) {
+			this.scoperto = scoperto;
+		}
 
-		public LocalDate getDataOraIntestazione() {
+		public LocalDateTime getDataOraIntestazione() {
 			return dataOraIntestazione;
 		}
 

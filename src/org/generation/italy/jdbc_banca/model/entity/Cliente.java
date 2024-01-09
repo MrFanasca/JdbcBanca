@@ -4,7 +4,6 @@ import java.util.Objects;
 
 public class Cliente {
 	
-	
 	/***********************/
     // DEFINIZIONE ATTRIBUTI
     /***********************/	
@@ -13,8 +12,18 @@ public class Cliente {
 		private String indirizzo;
 	
 	/***********************/
-	// COSTRUTTORE
-	/***********************/	
+	// COSTRUTTORI
+	/***********************/
+	// Polimorfismo sul costruttore poichè il campo indirizzo può essere NULL in generale tutti i campi NULL generano
+	// il polimorfismo sul costruttore come di seguito indicato.
+		
+		public Cliente(String nominativo, String codiceFiscale) {
+			
+			this.nominativo = nominativo;
+			this.codiceFiscale = codiceFiscale;
+			this.indirizzo = null;
+		}
+		
 		public Cliente(String nominativo, String codiceFiscale, String indirizzo) {
 			
 			this.nominativo = nominativo;
@@ -35,6 +44,10 @@ public class Cliente {
 
 		public String getIndirizzo() {
 			return indirizzo;
+		}
+		
+		public void setIndirizzo(String indirizzo) {
+			this.indirizzo = indirizzo;
 		}
 
     /***********************************************************************/

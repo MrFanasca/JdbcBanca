@@ -5,32 +5,31 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Movimento {
-
 	
 	/***********************/
     // DEFINIZIONE ATTRIBUTI
     /***********************/	
-		private Integer id;
+		private Long id;
 		private Float importo;
 		private String tipoOperazione;
 		private String iban;
-		private LocalDate dataOraOperazione;
+		private LocalDateTime dataOraOperazione;
 
 	/***********************/
 	// COSTRUTTORE
 	/***********************/
 	// costruttore usato per il metodo di INSERT		
-		public Movimento(Integer id, Float importo, String tipoOperazione, String iban) {
+		public Movimento(Long id, Float importo, String tipoOperazione, String iban) {
 
 			this.id = id;
 			this.importo = importo;
 			this.tipoOperazione = tipoOperazione;
 			this.iban = iban;
-			this.dataOraOperazione = LocalDate.now();
+			this.dataOraOperazione = LocalDateTime.now();
 		}
 		
 	// costruttore usato per i metodi di SELECT		
-		public Movimento(Integer id, Float importo, String tipoOperazione, String iban, LocalDate dataOraOperazione) {
+		public Movimento(Long id, Float importo, String tipoOperazione, String iban, LocalDateTime dataOraOperazione) {
 			
 			this.id = id;
 			this.importo = importo;
@@ -42,7 +41,7 @@ public class Movimento {
 	/********************/
 	// GETTERS & SETTERS
 	/********************/
-		public Integer getId() {
+		public Long getId() {
 			return id;
 		}
 
@@ -58,7 +57,7 @@ public class Movimento {
 			return iban;
 		}
 
-		public LocalDate getDataOraOperazione() {
+		public LocalDateTime getDataOraOperazione() {
 			return dataOraOperazione;
 		}
 
