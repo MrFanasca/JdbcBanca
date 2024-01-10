@@ -8,6 +8,8 @@ import java.time.LocalDate;
 
 import org.generation.italy.jdbc_banca.model.entity.Cliente;
 
+// Classe per le operazioni CRUD (CREATE READ UPDATE DELETE) su tabella cliente
+
 public class ClienteDao extends ADao{
 
 	public ClienteDao(Connection jdbcConnectionToDatabase) {

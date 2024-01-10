@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import org.generation.italy.jdbc_banca.model.entity.Cliente;
 import org.generation.italy.jdbc_banca.model.entity.Conto;
@@ -59,14 +60,14 @@ public class ContoDao extends ADao{
 				codiceFiscale = "";
 			}
 				
-			Integer scoperto = rsSelect.getInt("scoperto");
+			Float scoperto = rsSelect.getFloat("scoperto");
 			if (rsSelect.wasNull()) {
-				scoperto = 0;
+				scoperto = 0.0f;
 			}
 				
-			LocalDate dataOraIntestazione = rsSelect.getDate("data_ora_intestazione").toLocalDate();
+			LocalDateTime dataOraIntestazione = rsSelect.getTimestamp("data_ora_intestazione").toLocalDateTime();
 			if (rsSelect.wasNull()) {
-				dataOraIntestazione = LocalDate.of(0, 0, 0); 
+				dataOraIntestazione = LocalDateTime.of(LocalDate.of(0,0,0), LocalTime.of(0, 0, 0)); 
 			}
 				
 			contoTrovato = new Conto (iban1, valuta, codiceFiscale, scoperto, dataOraIntestazione);
@@ -84,17 +85,17 @@ public class ContoDao extends ADao{
 	 */
 	public void addConto (Conto conto) throws SQLException {
 			
-		String insertCliente =
+		String insertConto =
 				"INSERT INTO conto (iban, valuta, codice_fiscale, scoperto, data_ora_intestazione)"
 			  +	"     VALUES (?, ?, ?, ?, ?)                                                      ";
 			
 		PreparedStatement preparedStatementInsertConto =
-				this.jdbcConnectionToDatabase.prepareStatement(insertCliente);
+				this.jdbcConnectionToDatabase.prepareStatement(insertConto);
 			
 		preparedStatementInsertConto.setString(1, conto.getIban());
 		preparedStatementInsertConto.setString(2, conto.getValuta());
 		preparedStatementInsertConto.setString(3, conto.getCodiceFiscale());
-		preparedStatementInsertConto.setInt(4, conto.getScoperto());
+		preparedStatementInsertConto.setFloat(4, conto.getScoperto());
 		//preparedStatementInsertConto.setDate(5, conto.getDataOraIntestazione().toDate);
 			
 		preparedStatementInsertConto.executeQuery();

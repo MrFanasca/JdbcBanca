@@ -5,10 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generation.italy.jdbc_banca.model.entity.Conto;
 import org.generation.italy.jdbc_banca.model.entity.Movimento;
 
 public class MovimentoDao extends ADao{
@@ -26,7 +27,7 @@ public class MovimentoDao extends ADao{
 	 * @return oggetto di tipo classe movimento
 	 * @throws SQLException
 	 */
-	public Movimento loadMovimentoByPrimaryKey (Integer idMovimento)	throws SQLException {
+	public Movimento loadMovimentoByPrimaryKey (Long idMovimento)	throws SQLException {
 		
 		String selectFromMovimentoByPrimaryKey = 
 				"SELECT id, importo, tipo_operazione, iban, data_ora_operazione"
@@ -36,7 +37,7 @@ public class MovimentoDao extends ADao{
 		PreparedStatement preparedStatement = 
 				this.jdbcConnectionToDatabase.prepareStatement(selectFromMovimentoByPrimaryKey);
 		
-		preparedStatement.setInt(1, idMovimento);
+		preparedStatement.setLong(1, idMovimento);
 		
 		ResultSet rsSelect = 
 				preparedStatement.executeQuery();
@@ -45,9 +46,9 @@ public class MovimentoDao extends ADao{
 		
 		if (rsSelect.next())	{
 			
-			Integer id = rsSelect.getInt("id");
+			Long id = rsSelect.getLong("id");
 			if (rsSelect.wasNull())	{
-				id = 0;
+				id = (long) 0;
 			}
 			
 			Float importo = rsSelect.getFloat("importo");
@@ -65,9 +66,67 @@ public class MovimentoDao extends ADao{
 				iban = "";
 			}
 			
-			LocalDate dataOraOperazione = rsSelect.getDate("data_ora_operazione").toLocalDate();
+			LocalDateTime dataOraOperazione = rsSelect.getTimestamp("data_ora_operazione").toLocalDateTime();
 			if (rsSelect.wasNull()) {
-				dataOraOperazione = LocalDate.of(0, 0, 0); 
+				dataOraOperazione = LocalDateTime.of(LocalDate.of(0,0,0), LocalTime.of(0, 0, 0)); 
+			}
+			
+			movimentoTrovato = new Movimento (id, importo, tipoOperazione, iban, dataOraOperazione);
+		}
+				
+		return movimentoTrovato;
+	}
+	
+	/**
+	   // SELECT iban, codice_fiscale, importo, tipo_operazione
+	   //   FROM movimento
+	   //  WHERE iban = ?
+	 * @param ibanConto numero identificatifo del conto
+	 * @return oggetto di tipo classe movimento
+	 * @throws SQLException
+	 */
+	public Movimento loadMovimentoByIban (String ibanConto)	throws SQLException {
+		
+		String selectFromMovimentoByIban = 
+				"SELECT id, importo, tipo_operazione, iban, data_ora_operazione"
+			  + "  FROM movimento                                              "
+			  + " WHERE iban = ?                                                 ";
+		
+		PreparedStatement preparedStatement = 
+				this.jdbcConnectionToDatabase.prepareStatement(selectFromMovimentoByIban);
+		
+		preparedStatement.setString(1, ibanConto);
+		
+		ResultSet rsSelect = 
+				preparedStatement.executeQuery();
+		
+		Movimento movimentoTrovato = null;
+		
+		if (rsSelect.next())	{
+			
+			Long id = rsSelect.getLong("id");
+			if (rsSelect.wasNull())	{
+				id = (long) 0;
+			}
+			
+			Float importo = rsSelect.getFloat("importo");
+			if (rsSelect.wasNull()) {
+				importo = 0.0f;
+			}
+			
+			String tipoOperazione = rsSelect.getString("tipo_operazione");
+			if (rsSelect.wasNull()) {
+				tipoOperazione = "";
+			}
+			
+			String iban = rsSelect.getString("iban");
+			if(rsSelect.wasNull()) {
+				iban = "";
+			}
+			
+			LocalDateTime dataOraOperazione = rsSelect.getTimestamp("data_ora_operazione").toLocalDateTime();
+			if (rsSelect.wasNull()) {
+				dataOraOperazione = LocalDateTime.of(LocalDate.of(0,0,0), LocalTime.of(0, 0, 0)); 
 			}
 			
 			movimentoTrovato = new Movimento (id, importo, tipoOperazione, iban, dataOraOperazione);
@@ -101,9 +160,9 @@ public class MovimentoDao extends ADao{
 		
 		while (rsSelect.next())	{
 			
-			Integer id = rsSelect.getInt("id");
+			Long id = rsSelect.getLong("id");
 			if (rsSelect.wasNull())	{
-				id = 0;
+				id = (long) 0;
 			}
 			
 			Float importo1 = rsSelect.getFloat("importo");
@@ -121,9 +180,9 @@ public class MovimentoDao extends ADao{
 				iban = "";
 			}
 			
-			LocalDate  dataOraOperazione = rsSelect.getDate("data_ora_operazione").toLocalDate();
-			if (rsSelect.wasNull())	{
-				dataOraOperazione = LocalDate.of(0, 0, 0);
+			LocalDateTime dataOraOperazione = rsSelect.getTimestamp("data_ora_operazione").toLocalDateTime();
+			if (rsSelect.wasNull()) {
+				dataOraOperazione = LocalDateTime.of(LocalDate.of(0,0,0), LocalTime.of(0, 0, 0)); 
 			}
 			
 			Movimento movimentoLetto = new Movimento(id, importo1, tipoOperazione1, iban, dataOraOperazione);
@@ -150,7 +209,7 @@ public class MovimentoDao extends ADao{
 		PreparedStatement preparedStatementInsertMovimento =
 				this.jdbcConnectionToDatabase.prepareStatement(insertMovimento);
 			
-		preparedStatementInsertMovimento.setInt(1, movimento.getId());
+		preparedStatementInsertMovimento.setLong(1, movimento.getId());
 		preparedStatementInsertMovimento.setFloat(2, movimento.getImporto());
 		preparedStatementInsertMovimento.setString(3, movimento.getTipoOperazione());
 		preparedStatementInsertMovimento.setString(4, movimento.getIban());
@@ -176,6 +235,26 @@ public class MovimentoDao extends ADao{
 				this.jdbcConnectionToDatabase.prepareStatement(deleteMovimento);
 		
 		preparedStatementDeleteMovimento.setInt(1, idMovimento);
+		
+		preparedStatementDeleteMovimento.executeQuery();
+	}
+	
+	/**
+	 // DELETE FROM movimento
+	 //		  WHERE iban = ?
+	 * @param ibanConto numero identificativo del conto dal quale eliminare i movimenti
+	 * @throws SQLException
+	 */
+	public void removeMovimentoByIban (String ibanConto) throws SQLException {
+		
+		String deleteMovimento =
+				"DELETE FROM movimento"
+			  + "      WHERE iban = ?   ";
+		
+		PreparedStatement preparedStatementDeleteMovimento =
+				this.jdbcConnectionToDatabase.prepareStatement(deleteMovimento);
+		
+		preparedStatementDeleteMovimento.setString(1, ibanConto);
 		
 		preparedStatementDeleteMovimento.executeQuery();
 	}
