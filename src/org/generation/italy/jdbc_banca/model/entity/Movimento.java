@@ -1,96 +1,105 @@
 package org.generation.italy.jdbc_banca.model.entity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-// Classe entity-bean Movimento che effettua il mapping del record della tabella Movimento
-
 public class Movimento {
+
+    /*************************/
+    // DEFINIZIONE ATTRIBUTI //
+    /*************************/
+	private Long idMovimento;
+	private LocalDateTime dataOraOperazione;
+	private Float importo;
+	private String tipoOperazione;
+	private String iban;
 	
-	/***********************/
-    // DEFINIZIONE ATTRIBUTI
-    /***********************/	
-		private Long id;
-		private Float importo;
-		private String tipoOperazione;
-		private String iban;
-		private LocalDateTime dataOraOperazione;
+    /***************/
+    // COSTRUTTORI //
+    /***************/
+    //NOTA: Polimorfismo sul costruttore: poichè i campi id_movimento e data_ora_operazione sono valorizzati dal DBMS (vedi valore default: current_timstamp())
+    //      si possono ometttere nell'istanziazione della classe per scrivere il record (query di INSERT) relativo mentre è necessario indicarli nel costruttore per leggerli
+	
+	// costruttore usato per il metodo di INSERT
+	public Movimento(Long idMovimento, String iban, Float importo, String tipoOperazione, LocalDateTime dataOraOperazione) {
+		super();
+		this.idMovimento = idMovimento;
+		this.dataOraOperazione = dataOraOperazione;
+		this.importo = importo;
+		this.tipoOperazione = tipoOperazione;
+		this.iban = iban;
+	}
 
-	/***********************/
-	// COSTRUTTORE
-	/***********************/
-	// costruttore usato per il metodo di INSERT		
-		public Movimento(Long id, Float importo, String tipoOperazione, String iban) {
+	// costruttore usato per i metodi di SELECT
+	public Movimento(String iban, Float importo, String tipoOperazione) {
+		super();
+		this.idMovimento = idMovimento;
+		this.iban = iban;
+		this.dataOraOperazione = dataOraOperazione;
+		this.importo = importo;
+		this.tipoOperazione = tipoOperazione;
+	}	
+	
+	/*********************/
+    // GETTERS & SETTERS //
+    /*********************/    
+	/**
+     * NOTA: La scelta sull'uso o meno dei metodi GET per un attributo è basata sul seguente principio: tutti gli attributi che hanno necessità di lettura e/o 
+     * 		 aggiornametno dal chiamante hanno il relativo metodo GET, salvo quelli che per ragioni di sicurezza non debbono essere visibili al chiamante.
+     * 
+     * 		 La scelta sull'uso o meno dei metodi SET è basata sul seguente principio: sono con metodo SET solo quegli attributi che, una volta valorizzati nel 
+     * 		 costruttore, hanno necessità di un aggiornamento nel corso del tempo.
+     */
 
-			this.id = id;
-			this.importo = importo;
-			this.tipoOperazione = tipoOperazione;
-			this.iban = iban;
-			this.dataOraOperazione = LocalDateTime.now();
-		}
-		
-	// costruttore usato per i metodi di SELECT		
-		public Movimento(Long id, Float importo, String tipoOperazione, String iban, LocalDateTime dataOraOperazione) {
-			
-			this.id = id;
-			this.importo = importo;
-			this.tipoOperazione = tipoOperazione;
-			this.iban = iban;
-			this.dataOraOperazione = dataOraOperazione;
-		}	
-		
-	/********************/
-	// GETTERS & SETTERS
-	/********************/
-		public Long getId() {
-			return id;
-		}
+	public Long getIdMovimento() {
+		return idMovimento;
+	}
 
-		public Float getImporto() {
-			return importo;
-		}
+	public LocalDateTime getDataOraOperazione() {
+		return dataOraOperazione;
+	}
 
-		public String getTipoOperazione() {
-			return tipoOperazione;
-		}
+	public Float getImporto() {
+		return importo;
+	}
 
-		public String getIban() {
-			return iban;
-		}
+	public String getTipoOperazione() {
+		return tipoOperazione;
+	}
 
-		public LocalDateTime getDataOraOperazione() {
-			return dataOraOperazione;
-		}
+	public String getIban() {
+		return iban;
+	}
 
-	/***********************************************************************/
-	// METODI DERIVATI DALLA CLASSE OBJECT: toString(), equals(), hashCode()
-	/***********************************************************************/ 		
-		@Override
-		public int hashCode() {
-			return Objects.hash(dataOraOperazione, iban, id, importo, tipoOperazione);
-		}
+	
+	/*************************************************************************/
+    // METODI DERIVATI DALLA CLASSE OBJECT: toString(), equals(), hashCode() //
+    /*************************************************************************/  
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Movimento other = (Movimento) obj;
-			return Objects.equals(dataOraOperazione, other.dataOraOperazione) && Objects.equals(iban, other.iban)
-					&& Objects.equals(id, other.id) && Objects.equals(importo, other.importo)
-					&& Objects.equals(tipoOperazione, other.tipoOperazione);
-		}
+	@Override
+	public int hashCode() {
+		return Objects.hash(dataOraOperazione, iban, idMovimento, importo, tipoOperazione);
+	}
 
-		
-		
-		
-		
-		
-		
-		
-		
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Movimento other = (Movimento) obj;
+		return Objects.equals(dataOraOperazione, other.dataOraOperazione) && Objects.equals(iban, other.iban)
+				&& Objects.equals(idMovimento, other.idMovimento) && Objects.equals(importo, other.importo)
+				&& Objects.equals(tipoOperazione, other.tipoOperazione);
+	}
+
+	@Override
+	public String toString() {
+		return "\nMovimento [idMovimento=" + idMovimento + ", dataOraOperazione=" + dataOraOperazione + ", importo="
+				+ importo + ", tipoOperazione=" + tipoOperazione + ", iban=" + iban + "]";
+	}
+	
+	
 }

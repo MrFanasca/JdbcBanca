@@ -3,9 +3,15 @@ package org.generation.italy.jdbc_banca.model.dao;
 import java.sql.Connection;
 
 public abstract class ADao {
+
+    /*************************/
+    // DEFINIZIONE ATTRIBUTI //
+    /*************************/
+	protected Connection jdbcConnectionToDatabase;								
 	
-	protected Connection jdbcConnectionToDatabase;								// attributo di riferimento per la connessione al database
-	
+	/***************/
+    // COSTRUTTORE //
+    /***************/
 	public ADao(Connection jdbcConnectionToDatabase) {
 		this.jdbcConnectionToDatabase = jdbcConnectionToDatabase;
 	}

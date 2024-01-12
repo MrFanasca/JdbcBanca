@@ -4,108 +4,136 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.generation.italy.jdbc_banca.model.BancaModelException;
 import org.generation.italy.jdbc_banca.model.entity.Cliente;
 
 // Classe per le operazioni CRUD (CREATE READ UPDATE DELETE) su tabella cliente
 
-public class ClienteDao extends ADao{
+public class ClienteDao extends ADao {
 
+	/***************/
+    // COSTRUTTORE //
+    /***************/	
 	public ClienteDao(Connection jdbcConnectionToDatabase) {
 		super(jdbcConnectionToDatabase);
 	}
 	
-	// load => SELECT
+    /**************************/
+    // METODI DI LETTURA DATI //
+    /**************************/
 	/**
-	  // SELECT nominativo, codice_fiscale, indirizzo
-	  //   FROM cliente
-	  //  WHERE codice_fiscale = ?
-	* @param codice_fiscale codice identificatifo del cliente
-	* @return oggetto di tipo classe cliente
-	* @throws SQLException
-	*/
-	public Cliente loadClienteByPrimaryKey (String codiceFiscale)	throws SQLException {
-				
-		String selectFromClienteByPrimaryKey = 
-				"SELECT nominativo, codice_fiscale, indirizzo"
-			  + "  FROM conto                                "
-			  + " WHERE iban = ?                             ";
-				
-		PreparedStatement preparedStatement = 
-				this.jdbcConnectionToDatabase.prepareStatement(selectFromClienteByPrimaryKey);
-				
-		preparedStatement.setString(1, codiceFiscale);
-				
-		ResultSet rsSelect = 
-				preparedStatement.executeQuery();
-				
-		Cliente clienteTrovato = null;
-				
-		if (rsSelect.next())	{
-					
-			String nominativo = rsSelect.getString("iban");
-			if(rsSelect.wasNull()) {
-				nominativo = "";
-			}
-					
-			String codFiscale = rsSelect.getString("valuta");
-			if(rsSelect.wasNull()) {
-				codFiscale = "";
-			}
-					
-			String indirizzo = rsSelect.getString("codice_fiscale");
-			if (rsSelect.wasNull()) {
-				indirizzo = "";
-				}
-					
-			clienteTrovato = new Cliente (nominativo, codFiscale, indirizzo);
-		}
-						
-		return clienteTrovato;
-	}
-	
-	// add => INSERT
-	/**
-	 // INSERT INTO cliente (nominativo, codice_fiscale, indirizzo)
-	 //      VALUES (?, ?, ?)
-	 * @param cliente oggetto di tipo Cliente da inserire
-	 * @throws SQLException
+	 * Esecuzione di una query di SELECT con output i campi del record della tabella cliente
+	 * 
+	 * NOTA: il metodo private generalizza la necessità di caricare l'elenco ogni volta che si ha una SQL-SELECT su tabella 
+	 *       cliente 
+	 *  	  
+	 * @param preparedstatement query SQL che ritorna dei record cliente
+	 * @return elenco dei record cliente trovati
+	 * 
+	 * @throws BancaModelException : eccezione normalizzata
 	 */
-	public void addCliente (Cliente cliente) throws SQLException {
-		
-		String insertCliente =
-				"INSERT INTO cliente (nominativo, codice_fiscale, indirizzo)"
-			  +	"     VALUES (?, ?, ?)                                      ";
-		
-		PreparedStatement preparedStatementInsertCliente =
-				this.jdbcConnectionToDatabase.prepareStatement(insertCliente);
-		
-		preparedStatementInsertCliente.setString(1, cliente.getNominativo());
-		preparedStatementInsertCliente.setString(2, cliente.getCodiceFiscale());
-		preparedStatementInsertCliente.setString(3, cliente.getIndirizzo());
-		
-		preparedStatementInsertCliente.executeQuery();
-	}
 	
-	// remove => DELETE FROM
-	/**
-		// DELETE FROM cliente
-		//		 WHERE codice_fiscale = ?
-	 * @param codFiscale codice identificativo del cliente da eliminare
-	 * @throws SQLException
-	 */
-	public void removeClienteByPrimaryKey (String codFiscale) throws SQLException {
+	private List<Cliente> loadClientiByQuery(PreparedStatement preparedstatement) throws BancaModelException {
 
-		String deleteCliente =
-				"DELETE FROM cliente           "
-			  + "      WHERE codice_fiscale = ?";
+        List<Cliente> elencoClienti = new ArrayList<Cliente>();
 
-		PreparedStatement preparedStatementDeleteCliente =
-				this.jdbcConnectionToDatabase.prepareStatement(deleteCliente);
+        try {
 
-		preparedStatementDeleteCliente.setString(1, codFiscale);
+            ResultSet rsSelect
+                    = preparedstatement.executeQuery();
 
-		preparedStatementDeleteCliente.executeQuery();
-	}	
+            while (rsSelect.next()) {
+
+                String codFiscale = rsSelect.getString("codice_fiscale");
+                if (rsSelect.wasNull()) {
+                    codFiscale = "";
+                }
+
+                String nominativo
+                        = rsSelect.getString("nominativo");
+                if (rsSelect.wasNull()) {
+                    nominativo = "";
+                }
+
+                String indirizzo = rsSelect.getString("indirizzo");
+		        if (rsSelect.wasNull()) {
+		        	indirizzo = "";
+		        }
+		        
+                Cliente cliente = new Cliente(codFiscale, nominativo, indirizzo);                
+                elencoClienti.add(cliente);
+
+            }
+
+        } catch (SQLException sqlException) {
+
+            throw new BancaModelException(										// normalizzazione dell'eccezione SQLException
+            		"ClienteDao -> loadCliente -> " + sqlException.getMessage());	  																	
+        }
+        
+        return elencoClienti;
+    }	
+	
+	// Query di SELECT con input la Primary Key
+	public Cliente loadClienteByPrimaryKey(String codiceFiscale) throws BancaModelException {
+        
+        Cliente cliente = null;
+        
+        try {
+        	
+            List<Cliente> elencoClienti = new ArrayList<Cliente>();
+                
+            PreparedStatement preparedStatement = 
+            		this.jdbcConnectionToDatabase.prepareStatement(QueryCatalog.selectFromClienteByPrimaryKey);
+
+            preparedStatement.setString(1, codiceFiscale);
+                      
+            elencoClienti = loadClientiByQuery(preparedStatement);                                        
+
+            if (elencoClienti.size() == 1) {
+                cliente = elencoClienti.get(0);
+            }
+            
+        } catch (SQLException sqlException) {                                  
+           
+            throw new BancaModelException("ClienteDao -> loadClienteByPrimaryKey -> " + sqlException.getMessage());
+        }
+
+        return cliente;
+    }
+	
+    /****************************/
+    // METODI DI SCRITTURA DATI //
+    /****************************/	
+    public void addCliente(Cliente cliente) throws BancaModelException {
+        
+        try {           
+            
+            PreparedStatement preparedStatement = 
+            		this.jdbcConnectionToDatabase.prepareStatement(QueryCatalog.insertCliente);
+            
+            preparedStatement.setString(1, cliente.getCodiceFiscale());
+            preparedStatement.setString(2, cliente.getNominativo());            
+            
+            if (cliente.getIndirizzo() == null) {
+            	preparedStatement.setNull(3, java.sql.Types.VARCHAR);
+        	}
+            
+            else {
+                preparedStatement.setString(3, cliente.getIndirizzo());            
+            }
+            
+            preparedStatement.executeUpdate();
+    
+        } catch (SQLException sqlException) {
+        	
+            throw new BancaModelException("ClienteDao -> addCliente -> " + sqlException.getMessage());
+            
+        }
+        
+    }
+	
 }

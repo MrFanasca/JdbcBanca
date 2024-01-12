@@ -5,79 +5,84 @@ import java.util.Objects;
 // Classe entity-bean Cliente che effettua il mapping del record della tabella Cliente
 
 public class Cliente {
-	
-	/***********************/
-    // DEFINIZIONE ATTRIBUTI
-    /***********************/	
-		private String nominativo;
-		private String codiceFiscale;
-		private String indirizzo;
-	
-	/***********************/
-	// COSTRUTTORI
-	/***********************/
-	// Polimorfismo sul costruttore poichè il campo indirizzo può essere NULL in generale tutti i campi NULL generano
-	// il polimorfismo sul costruttore come di seguito indicato.
-		
-		public Cliente(String nominativo, String codiceFiscale) {
-			
-			this.nominativo = nominativo;
-			this.codiceFiscale = codiceFiscale;
-			this.indirizzo = null;
-		}
-		
-		public Cliente(String nominativo, String codiceFiscale, String indirizzo) {
-			
-			this.nominativo = nominativo;
-			this.codiceFiscale = codiceFiscale;
-			this.indirizzo = indirizzo;
-		}
-	
-	/********************/
-	// GETTERS & SETTERS
-	/********************/	
-		public String getNominativo() {
-			return nominativo;
-		}
+    
+    /*************************/
+    // DEFINIZIONE ATTRIBUTI //
+    /*************************/
+    private String codiceFiscale;
+    private String nominativo;
+    private String indirizzo;
+    
 
-		public String getCodiceFiscale() {
-			return codiceFiscale;
-		}
+    /***************/
+    // COSTRUTTORI //
+    /***************/
+    // NOTA: Polimorfismo sul costruttore poichè il campo indirizzo può essere NULL in generale tutti i campi NULL generano il polimorfismo sul costruttore 
+    //		 come di seguito indicato.
+    
+    public Cliente(String codiceFiscale, String nominativo, String indirizzo) {
+        this.codiceFiscale = codiceFiscale;
+        this.nominativo = nominativo;
+        this.indirizzo = indirizzo;
+    }
 
-		public String getIndirizzo() {
-			return indirizzo;
-		}
-		
-		public void setIndirizzo(String indirizzo) {
-			this.indirizzo = indirizzo;
-		}
+    public Cliente(String codiceFiscale, String nominativo) {
+		this.codiceFiscale = codiceFiscale;
+		this.nominativo = nominativo;
+		this.indirizzo = null;
+	}
 
-    /***********************************************************************/
-    // METODI DERIVATI DALLA CLASSE OBJECT: toString(), equals(), hashCode()
-    /***********************************************************************/  
-		@Override
-		public int hashCode() {
-			return Objects.hash(codiceFiscale, indirizzo, nominativo);
-		}
+	/*********************/
+    // GETTERS & SETTERS //
+    /*********************/
+    /**
+     * NOTA: La scelta sull'uso o meno dei metodi GET per un attributo è basata sul seguente principio: tutti gli attributi che hanno necessità di lettura e/o 
+     * 		 aggiornametno dal chiamante hanno il relativo metodo GET, salvo quelli che per ragioni di sicurezza non debbono essere visibili al chiamante.
+     * 
+     * 		 La scelta sull'uso o meno dei metodi SET è basata sul seguente principio: sono con metodo SET solo quegli attributi che, una volta valorizzati nel 
+     * 		 costruttore, hanno necessità di un aggiornamento nel corso del tempo.
+     */
+   
+    public String getCodiceFiscale() {
+        return codiceFiscale;
+    }
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Cliente other = (Cliente) obj;
-			return Objects.equals(codiceFiscale, other.codiceFiscale) && Objects.equals(indirizzo, other.indirizzo)
-					&& Objects.equals(nominativo, other.nominativo);
-		}
-	
-	
-	
-	
-	
-	
-	
-	
+    public String getNominativo() {
+        return nominativo;
+    }
+
+	public void setIndirizzo(String indirizzo) {
+		this.indirizzo = indirizzo;
+	}
+	public String getIndirizzo() {
+		return indirizzo;
+	}
+
+	/*************************************************************************/
+    // METODI DERIVATI DALLA CLASSE OBJECT: toString(), equals(), hashCode() //
+    /*************************************************************************/  
+ 	@Override
+	public int hashCode() {
+		return Objects.hash(codiceFiscale, indirizzo, nominativo);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Cliente other = (Cliente) obj;
+		return Objects.equals(codiceFiscale, other.codiceFiscale) && Objects.equals(indirizzo, other.indirizzo)
+				&& Objects.equals(nominativo, other.nominativo);
+	}
+
+	@Override
+	public String toString() {
+		return "\nCliente [codiceFiscale=" + codiceFiscale + ", nominativo=" + nominativo + ", indirizzo=" + indirizzo
+				+ "]";
+	}
+   
 }

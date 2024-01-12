@@ -7,118 +7,145 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.generation.italy.jdbc_banca.model.entity.Cliente;
+import org.generation.italy.jdbc_banca.model.BancaModelException;
 import org.generation.italy.jdbc_banca.model.entity.Conto;
 
-public class ContoDao extends ADao{
+//Classe per le operazioni CRUD (CREATE READ UPDATE DELETE) su tabella conto
 
+public class ContoDao extends ADao {
+
+	/***************/
+    // COSTRUTTORE //
+    /***************/	
 	public ContoDao(Connection jdbcConnectionToDatabase) {
 		super(jdbcConnectionToDatabase);
 	}
 
-	// load => SELECT
+    /**************************/
+    // METODI DI LETTURA DATI //
+    /**************************/
 	/**
-	   // SELECT iban, valuta, codice_fiscale, scoperto, data_ora_intestazione
-	   //   FROM conto
-	   //  WHERE iban = ?
-	 * @param iban codice identificatifo del conto
-	 * @return oggetto di tipo classe conto
-	 * @throws SQLException
+	 * Esecuzione di una query di SELECT con output i campi del record della tabella Conto
+	 * 
+	 * NOTA: il metodo private generalizza la ncessità di caricare l'elenco ogni volta che si ha una SQL-SELECT su tabella Conto 
+	 *  	  
+	 * @param preparedstatement query SQL che ritorna dei record Conto
+	 * @return elenco dei record Conto trovati
+	 * 
+	 * @throws BancaModelException : eccezione normalizzata
 	 */
-	public Conto loadContoByPrimaryKey (String iban)	throws SQLException {
-			
-		String selectFromContoByPrimaryKey = 
-				"SELECT iban, valuta, codice_fiscale, scoperto, data_ora_intestazione"
-			  + "  FROM conto                                                        "
-			  + " WHERE iban = ?                                                     ";
-			
-		PreparedStatement preparedStatement = 
-				this.jdbcConnectionToDatabase.prepareStatement(selectFromContoByPrimaryKey);
-			
-		preparedStatement.setString(1, iban);
-			
-		ResultSet rsSelect = 
-				preparedStatement.executeQuery();
-			
-		Conto contoTrovato = null;
-			
-		if (rsSelect.next())	{
-				
-			String iban1 = rsSelect.getString("iban");
-			if(rsSelect.wasNull()) {
-				iban1 = "";
-			}
-				
-			String valuta = rsSelect.getString("valuta");
-			if(rsSelect.wasNull()) {
-				valuta = "";
-			}
-				
-			String codiceFiscale = rsSelect.getString("codice_fiscale");
-			if (rsSelect.wasNull()) {
-				codiceFiscale = "";
-			}
-				
-			Float scoperto = rsSelect.getFloat("scoperto");
-			if (rsSelect.wasNull()) {
-				scoperto = 0.0f;
-			}
-				
-			LocalDateTime dataOraIntestazione = rsSelect.getTimestamp("data_ora_intestazione").toLocalDateTime();
-			if (rsSelect.wasNull()) {
-				dataOraIntestazione = LocalDateTime.of(LocalDate.of(0,0,0), LocalTime.of(0, 0, 0)); 
-			}
-				
-			contoTrovato = new Conto (iban1, valuta, codiceFiscale, scoperto, dataOraIntestazione);
-		}
-					
-		return contoTrovato;
-	}
-		
-	// add => INSERT
-	/**
-	 // INSERT INTO conto (iban, valuta, codice_fiscale, scoperto, data_ora_intestazione)
-	 //      VALUES (?, ?, ?, ?, ?)
-	 * @param conto oggetto di tipo Conto da inserire
-	 * @throws SQLException
-	 */
-	public void addConto (Conto conto) throws SQLException {
-			
-		String insertConto =
-				"INSERT INTO conto (iban, valuta, codice_fiscale, scoperto, data_ora_intestazione)"
-			  +	"     VALUES (?, ?, ?, ?, ?)                                                      ";
-			
-		PreparedStatement preparedStatementInsertConto =
-				this.jdbcConnectionToDatabase.prepareStatement(insertConto);
-			
-		preparedStatementInsertConto.setString(1, conto.getIban());
-		preparedStatementInsertConto.setString(2, conto.getValuta());
-		preparedStatementInsertConto.setString(3, conto.getCodiceFiscale());
-		preparedStatementInsertConto.setFloat(4, conto.getScoperto());
-		//preparedStatementInsertConto.setDate(5, conto.getDataOraIntestazione().toDate);
-			
-		preparedStatementInsertConto.executeQuery();
-	}
 	
-	// remove => DELETE FROM
-	/**
-	// DELETE FROM conto
-	//		  WHERE iban = ?
-	* @param iban numero identificativo del conto da eliminare
-	* @throws SQLException
-	*/
-	public void removeContoByPrimaryKey (String iban) throws SQLException {
-			
-		String deleteConto =
-				"DELETE FROM conto   "
-			  + "      WHERE iban = ?";
-			
-		PreparedStatement preparedStatementDeleteConto =
-				this.jdbcConnectionToDatabase.prepareStatement(deleteConto);
-			
-		preparedStatementDeleteConto.setString(1, iban);
-			
-		preparedStatementDeleteConto.executeQuery();
-	}
+	private List<Conto> loadContiByQuery(PreparedStatement preparedstatement) throws BancaModelException {
+
+        List<Conto> elencoConti = new ArrayList<Conto>();
+
+        try {
+            ResultSet rsSelect = preparedstatement.executeQuery();
+
+            while (rsSelect.next()) {
+
+                String iban = rsSelect.getString("iban");
+                if (rsSelect.wasNull()) { 
+                	iban = ""; 
+                }
+                
+                String codiceFiscale = rsSelect.getString("codice_fiscale");
+                if (rsSelect.wasNull()) { 
+                	codiceFiscale = ""; 
+                }
+
+                String valuta = rsSelect.getString("valuta");
+                if (rsSelect.wasNull()) { 
+                	valuta = ""; 
+                }
+
+                LocalDateTime dataOraIntestazione = rsSelect.getTimestamp("data_ora_intestazione").toLocalDateTime();
+		        if (rsSelect.wasNull()) {
+		        	dataOraIntestazione = LocalDateTime.of(LocalDate.of(0,0,0), LocalTime.of(0, 0, 0));
+		        }
+		        
+		        Float saldo = rsSelect.getFloat("saldo");
+		        if (rsSelect.wasNull()) {
+		        	saldo = 0.0f;
+		        }
+
+		        Float scoperto = rsSelect.getFloat("scoperto");
+		        if (rsSelect.wasNull()) {
+		        	scoperto = 0.0f;
+		        }
+		        
+		        Conto conto = new Conto(iban, codiceFiscale, valuta, saldo, scoperto, dataOraIntestazione);
+
+                elencoConti.add(conto);
+
+            }
+
+        } catch (SQLException sqlException) {
+
+            throw new BancaModelException(										// normalizzazione dell'eccezione SQLException
+            		"ContoDao -> loadContiByQuery -> " + sqlException.getMessage());
+        }
+        
+        return elencoConti;
+    }	
+
+	// Query di SELECT con input la Primary Key
+	public Conto loadContoByPrimaryKey(String iban)	throws BancaModelException {
+        
+        Conto Conto = null;
+        
+        try {
+        	
+            List<Conto> elencoConti = new ArrayList<Conto>();
+                
+            PreparedStatement preparedStatement = 
+            		this.jdbcConnectionToDatabase.prepareStatement(QueryCatalog.selectFromContoByPrimaryKey);
+
+            preparedStatement.setString(1, iban);
+                      
+            elencoConti = loadContiByQuery(preparedStatement);                                        
+
+            if (elencoConti.size() == 1) {
+                Conto = elencoConti.get(0);
+            }
+            
+        } catch (SQLException sqlException) {                                  
+           
+            throw new BancaModelException("ContoDao -> loadContoByPrimaryKey -> " + sqlException.getMessage());
+        }
+
+        return Conto;
+    }	
+	
+    /****************************/
+    // METODI DI SCRITTURA DATI //
+    /****************************/
+    public void addConto(Conto conto) throws BancaModelException {
+        
+        try {           
+            
+            PreparedStatement preparedStatement = 
+            		this.jdbcConnectionToDatabase.prepareStatement(QueryCatalog.insertConto);
+            
+            preparedStatement.setString(1, conto.getIban());
+            preparedStatement.setString(2, conto.getCodiceFiscale());            
+            preparedStatement.setString(3, conto.getValuta());            
+            preparedStatement.setFloat(4, conto.getScoperto());            
+            
+            preparedStatement.executeUpdate();
+    
+        } catch (SQLException sqlException) {
+        	
+            throw new BancaModelException("ContoDao -> addConto -> " + sqlException.getMessage());
+            
+        }
+        
+    }
+	
+	
 }
+	
+
