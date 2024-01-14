@@ -105,6 +105,27 @@ public class ClienteDao extends ADao {
         return cliente;
     }
 	
+	// Query di Query di SELECT con input iban (ESERCIZIO 11/1.1)
+	public List<Cliente> loadClienteSenzaContoByIban () throws BancaModelException	{
+		
+		List<Cliente> clientiSenzaConto = new ArrayList <>();
+		
+		try {
+			
+			PreparedStatement preparedStatement =
+					this.jdbcConnectionToDatabase.prepareStatement(QueryCatalog.selectFromClienteByIbanNull);
+			
+			clientiSenzaConto = loadClientiByQuery(preparedStatement);
+			
+			
+		} catch (SQLException sqlException) {
+			
+			throw new BancaModelException("ClienteDao -> loadClienteSenzaContoByIban -> " + sqlException.getMessage());
+		}
+		
+		return clientiSenzaConto;
+	}
+	
     /****************************/
     // METODI DI SCRITTURA DATI //
     /****************************/	

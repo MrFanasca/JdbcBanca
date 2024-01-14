@@ -118,7 +118,100 @@ public class ContoDao extends ADao {
         }
 
         return Conto;
-    }	
+    }
+	
+	// Query di SELECT con input il codice fiscale del cliente associato
+		public List<Conto> loadContoByCodiceFiscale (String codiceFiscale) throws BancaModelException {
+			
+			List<Conto> elencoConti = new ArrayList<Conto>();
+			
+			try {
+				
+				PreparedStatement preparedStatement =
+						this.jdbcConnectionToDatabase.prepareStatement(QueryCatalog.selectFromContoByCodiceFiscale);
+				
+				preparedStatement.setString(1, codiceFiscale);
+				
+				elencoConti = loadContiByQuery(preparedStatement);
+				
+			} catch (SQLException sqlException) {
+				
+				throw new BancaModelException("ContoDao -> loadContoByCodiceFiscale -> " + sqlException.getMessage());
+			}
+			
+			return elencoConti;
+		}
+	
+	// Query di SELECT con input nominativo che contiene un determinato valore (ESERCIZIO 11/1.2)
+	public List<Conto> loadContoByNominativoLike (String nominativo) throws BancaModelException {
+		
+		List<Conto> elencoConti = new ArrayList<Conto>();
+		
+		try {
+			
+			PreparedStatement preparedStatement =
+					this.jdbcConnectionToDatabase.prepareStatement(QueryCatalog.selectFromContoByNominativoLike);
+			
+			preparedStatement.setString(1, nominativo);
+			
+			elencoConti = loadContiByQuery(preparedStatement);
+			
+		} catch (SQLException sqlException) {
+			
+			throw new BancaModelException("ContoDao -> loadContoByNominativoLike -> " + sqlException.getMessage());
+		}
+		
+		return elencoConti;
+	}
+	
+	// Query di SELECT con input un totale (versato o prelevato), in una certa valuta e per un importo inferiore ad una certa cifra (ESERCIZIO 11/1.3)
+	public List<Conto> loadContoByTotaleOperazioneValutaImportoInferiore (
+										String tipoOperazione, String valuta, Float importo) throws BancaModelException {
+		
+		List<Conto> elencoConti = new ArrayList<>();
+		
+		try {
+			
+			PreparedStatement preparedStatement = 
+					this.jdbcConnectionToDatabase.prepareStatement(QueryCatalog.selectFromContoByTotaleOperazioneValutaImportoMinore);
+			
+			preparedStatement.setString(1, tipoOperazione);
+			preparedStatement.setString(2, valuta);
+			preparedStatement.setFloat(3, importo);
+			
+			elencoConti = loadContiByQuery(preparedStatement);
+			
+		} catch (SQLException sqlException) {
+			
+			throw new BancaModelException("ContoDao -> loadContoByTotaleOperazioneValutaImportoInferiore -> " + sqlException.getMessage());
+		}
+		
+		return elencoConti;		
+	}
+	
+	// Query di SELECT con input tipo operazione con un importo inferiore a una certa cifra (ESERCIZIO 11/1.5.e)
+	public List<Conto> loadContoByTipoOperazioneValutaImportoMinore (String tipoOperazione, String valuta, Float importo) throws BancaModelException {
+		
+		List<Conto> elencoConti = new ArrayList<>();
+		
+		try {
+			
+			PreparedStatement preparedStatement =
+					this.jdbcConnectionToDatabase.prepareStatement(QueryCatalog.selectFromContoByTipoOperazioneValutaImportoMinore);
+			
+			preparedStatement.setString(1, tipoOperazione);
+			preparedStatement.setFloat(2, importo);
+			preparedStatement.setString(3, valuta);
+			
+			elencoConti = loadContiByQuery(preparedStatement);
+			
+		} catch (SQLException sqlException) {
+			
+			throw new BancaModelException("ContoDao -> loadContoByTipoOperazioneValutaImportoMinore -> " + sqlException.getMessage());
+		}
+		
+		return elencoConti;
+	}
 	
     /****************************/
     // METODI DI SCRITTURA DATI //
