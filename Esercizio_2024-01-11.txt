@@ -67,10 +67,40 @@ Nella classe TestJdbcBanca, al metodo main(), ai fini della verifica di quanto i
 	b) aggiungere un conto per uno dei clienti senza conto
 	c) aggiungere un ulteriore conto per il cliente di cui al punto b)
 	d) stampare i conti del cliente per cui si sono aggiunto i due conti
-
 	e) stampare i conti su cui è stata effettuata operazione di prelievo
-	   con un importo inferiore a 856 euro.
-	   
-	f) aggiornare i conti in eruo con uno scoperto superiore a 565 euro    
+	   con un importo inferiore a 856 euro.	   
+	f) aggiornare i conti in eruo con uno scoperto superiore a 565 euro  
+	
+	
+-----------------------------------------------------------------------------------------------------------------------------
+SOLUZIONI
+	
+/* ESERCIZIO 11/1.5 */
+		// a) stampare l'elenco dei clienti senza conto.
+			List<Cliente> clientiSenzaConto = testJdbcBanca.clienteDao.loadClienteSenzaContoByIban();
+			
+			System.out.println("\nClienti senza un conto: ");
+			System.out.println(clientiSenzaConto);
+			
+		// b) aggiungere un conto per uno dei clienti senza conto.
+			if (clientiSenzaConto.size()!=0) {
+				
+				testJdbcBanca.contoDao.addConto(new Conto("ITzz1234567890123456789012345678", clientiSenzaConto.get(0).getCodiceFiscale(), "USD", 500.0f));
+				
+		// c) aggiungere un ulteriore conto per il cliente di cui al punto b).
+				testJdbcBanca.contoDao.addConto(new Conto("DEff2345678901234567890123456789", clientiSenzaConto.get(0).getCodiceFiscale(), "EUR", 750.0f));
+				
+		// d) stampare i conti del cliente per cui si sono aggiunto i due conti.
+				System.out.println("\nConti aggiunti al cliente " + clientiSenzaConto.get(0).getNominativo() + ":");
+				System.out.println(testJdbcBanca.contoDao.loadContoByCodiceFiscale(clientiSenzaConto.get(0).getCodiceFiscale()));
+			}
+			
+		// e) stampare i conti su cui è stata effettuata operazione di prelievo con un importo inferiore a 856 euro.
+			List<Conto> elencoContiPrelievo = testJdbcBanca.contoDao.loadContoByTipoOperazioneValutaImportoMinore("P", "EUR", 856.0f);
+			System.out.println("\nConti con operazione di prelievo minore di 856 euro");
+			System.out.println(elencoContiPrelievo);
+			
+		// f) aggiornare i conti in euro con uno scoperto superiore a 565 euro 	
+	
 
 

@@ -71,6 +71,7 @@ public class Conto {
 	public void setScoperto(Float scoperto) {
 		this.scoperto = scoperto;
 	}
+	
 	public Float getScoperto() {
 		return scoperto;
 	}

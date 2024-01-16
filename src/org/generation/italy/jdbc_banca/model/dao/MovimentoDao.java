@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generation.italy.jdbc_banca.model.BancaModelException;
+import org.generation.italy.jdbc_banca.model.entity.Conto;
 import org.generation.italy.jdbc_banca.model.entity.Movimento;
 
 //Classe per le operazioni CRUD (CREATE READ UPDATE DELETE) su tabella movimento
@@ -144,18 +145,43 @@ public class MovimentoDao extends ADao {
     /****************************/	
     public void addMovimento(Movimento movimento) throws BancaModelException {
         
-        try {           
-                  
+        try {  
+        	
+        	this.jdbcConnectionToDatabase.setAutoCommit(false);
+        	
         	Trigger.checkBeforeInsertMovimento(movimento);
         	
+        	ContoDao contoDao = new ContoDao(this.jdbcConnectionToDatabase);
+        	Conto conto = contoDao.loadContoByPrimaryKey(movimento.getIban());        	
+                  
             PreparedStatement preparedStatement = 
             		this.jdbcConnectionToDatabase.prepareStatement(QueryCatalog.insertMovimento);
             
             preparedStatement.setString(1, movimento.getIban());
             preparedStatement.setFloat(2, movimento.getImporto());            
-            preparedStatement.setString(3, movimento.getTipoOperazione());            
+            preparedStatement.setString(3, movimento.getTipoOperazione()); 
+            
+            Float nuovoSaldo;
+            
+            if (movimento.getTipoOperazione().equals("V")) {            
+            	nuovoSaldo = conto.getSaldo() + movimento.getImporto();
+            }
+            else {
+            	nuovoSaldo = conto.getSaldo() - movimento.getImporto();
+            }
+            
+             PreparedStatement preparedStatement1 =
+            		this.jdbcConnectionToDatabase.prepareStatement(QueryCatalog.updateContoSetSaldoByIban);
+            
+            preparedStatement1.setFloat(1, nuovoSaldo);
+            preparedStatement1.setString(2, movimento.getIban());
             
             preparedStatement.executeUpdate();
+            preparedStatement1.executeUpdate();
+            
+            this.jdbcConnectionToDatabase.commit();
+            
+            this.jdbcConnectionToDatabase.setAutoCommit(true);
     
         } catch (SQLException sqlException) {
         	

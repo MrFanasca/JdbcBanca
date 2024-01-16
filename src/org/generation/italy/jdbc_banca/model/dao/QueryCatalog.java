@@ -118,5 +118,11 @@ public class QueryCatalog {
 		  + "    AND mo.importo IS NOT NULL "
 		  + "  GROUP BY mo.iban "
 		  + "    AND co.valuta = ? ";
+	
+	// ESERCIZIO 16.1
+	public static final String updateContoSetSaldoByIban =
+			" UPDATE conto "
+		  + "    SET saldo = ? "
+		  + "  WHERE iban = ? ";
 		  
 }

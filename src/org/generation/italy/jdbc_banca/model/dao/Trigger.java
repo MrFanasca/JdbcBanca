@@ -55,16 +55,15 @@ public class Trigger {
 		 }
 	}
 	 
-	 public static void checkBeforeInsertConto(Conto conto) throws BancaModelException {
+	// 3) Implementare nella classe trigger un metodo che impedisca l'inserimento del conto per un cliente che ha già un massimo di conti
+	public static void checkBeforeInsertConto(Conto conto) throws BancaModelException {
 		 
-		 // 3) Implementare nella classe trigger un metodo che impedisca l'inserimento del conto per un cliente che ha già un massimo di conti
-		 List<Conto> elencoConti = contoDao.loadContoByCodiceFiscale(conto.getCodiceFiscale());
+		List<Conto> elencoConti = contoDao.loadContoByCodiceFiscale(conto.getCodiceFiscale());
 
-		 if (elencoConti.size()>=BancaModelConstants.maxContiDiProprietaPerUnCliente) {
+		if (elencoConti.size()>=BancaModelConstants.maxContiDiProprietaPerUnCliente) {
 
-		 throw new BancaModelException ("Trigger -> checkBeforeInsertConto -> sono qià stati creati quattro conti per questo cliente!");
-	 }
-	 
- }
-
+		throw new BancaModelException ("Trigger -> checkBeforeInsertConto -> sono qià stati creati il numero massimo di conti per questo cliente!");
+		}	 
+	}
+	
 }
