@@ -4,6 +4,7 @@ package org.generation.italy.jdbc_banca.model.dao;
 
 import java.util.List;
 
+import org.generation.italy.jdbc_banca.model.BancaModelConstants;
 import org.generation.italy.jdbc_banca.model.BancaModelException;
 import org.generation.italy.jdbc_banca.model.entity.Conto;
 import org.generation.italy.jdbc_banca.model.entity.Movimento;
@@ -48,11 +49,22 @@ public class Trigger {
 		 //2) Un movimento può essere inserito solo se non sono stati già effettuati più di due movimenti sul conto 
 		 List<Movimento> elencoMovimenti = movimentoDao.loadMovimentoByIban(movimento.getIban());
 
-		 if (elencoMovimenti.size()>=2)	{
+		 if (elencoMovimenti.size()>=BancaModelConstants.maxContiDiProprietaPerUnCliente)	{
 
 			 throw new BancaModelException ("Trigger -> checkBeforeInsertMovimento -> sono qià stati effettuati due monimenti sul conto!");
 		 }
+	}
+	 
+	 public static void checkBeforeInsertConto(Conto conto) throws BancaModelException {
 		 
-	 } 
+		 // 3) Implementare nella classe trigger un metodo che impedisca l'inserimento del conto per un cliente che ha già un massimo di conti
+		 List<Conto> elencoConti = contoDao.loadContoByCodiceFiscale(conto.getCodiceFiscale());
+
+		 if (elencoConti.size()>=BancaModelConstants.maxContiDiProprietaPerUnCliente) {
+
+		 throw new BancaModelException ("Trigger -> checkBeforeInsertConto -> sono qià stati creati quattro conti per questo cliente!");
+	 }
+	 
+ }
 
 }

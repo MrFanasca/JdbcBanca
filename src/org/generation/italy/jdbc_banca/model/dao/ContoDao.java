@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -216,10 +217,31 @@ public class ContoDao extends ADao {
     /****************************/
     // METODI DI SCRITTURA DATI //
     /****************************/
+	public void updateConto (LocalDateTime dataOraIntestazione, String valuta, Float scoperto) throws BancaModelException {
+		
+		try {
+			
+			PreparedStatement preparedStatement =
+					this.jdbcConnectionToDatabase.prepareStatement(QueryCatalog.updateContoSetDataOraIntestazioneByScopertoValuta);
+			
+			preparedStatement.setTimestamp(1, Timestamp.valueOf(dataOraIntestazione.toString()));
+			preparedStatement.setFloat(2, scoperto);
+			preparedStatement.setString(3, valuta);
+			
+			preparedStatement.executeUpdate();
+			
+		} catch (SQLException sqlException) {
+			
+			throw new BancaModelException("ContoDao -> updateConto -> " + sqlException.getMessage());
+		}
+	}
+	
     public void addConto(Conto conto) throws BancaModelException {
         
         try {           
             
+        	Trigger.checkBeforeInsertConto(conto);
+        	
             PreparedStatement preparedStatement = 
             		this.jdbcConnectionToDatabase.prepareStatement(QueryCatalog.insertConto);
             
@@ -233,11 +255,9 @@ public class ContoDao extends ADao {
         } catch (SQLException sqlException) {
         	
             throw new BancaModelException("ContoDao -> addConto -> " + sqlException.getMessage());
-            
         }
         
     }
-	
 	
 }
 	

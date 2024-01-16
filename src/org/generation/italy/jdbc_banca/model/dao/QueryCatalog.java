@@ -99,6 +99,15 @@ public class QueryCatalog {
 		  + "    AND importo_V_o_P IS NOT NULL ";
 	
 	
+	// 4) aggiornare tutti i conti in una certa valuta, che hanno uno scoperto superiore ad una cifra X, ponendo la data ed ora di intestazione ad un valore a 
+	//    piacere	
+	
+	public static final String updateContoSetDataOraIntestazioneByScopertoValuta =
+			" UPDATE conto "
+		  + "    SET data_ora_intestazione = ? "
+		  + "  WHERE scoperto > ? "
+		  + "    AND valuta = ? ";
+	
     // 5.e) selezionare tutti i conti per un tipo di operazione (versamento o prelievo) con importo inferiore ad una certa cifra
 	
 	public static final String selectFromContoByTipoOperazioneValutaImportoMinore =

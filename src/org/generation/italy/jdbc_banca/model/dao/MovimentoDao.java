@@ -145,7 +145,9 @@ public class MovimentoDao extends ADao {
     public void addMovimento(Movimento movimento) throws BancaModelException {
         
         try {           
-                    	
+                  
+        	Trigger.checkBeforeInsertMovimento(movimento);
+        	
             PreparedStatement preparedStatement = 
             		this.jdbcConnectionToDatabase.prepareStatement(QueryCatalog.insertMovimento);
             
